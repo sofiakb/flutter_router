@@ -6,7 +6,7 @@
 
 <p align="center">
 
-  <h1 align="center">Born 2 shine</h1>
+  <h1 align="center">Flutter router</h1>
 
   <p align="center">
       <!--<a href="https://github.com/sofiakb/flutter_router"><strong>Explore the docs »</strong></a>-->
