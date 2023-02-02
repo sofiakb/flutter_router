@@ -22,7 +22,7 @@ class Rodeo {
   static Rodeo key(GlobalKey<NavigatorState> navigatorKey) =>
       Rodeo(navigatorKey: navigatorKey);
 
-  push(String routeName, {Map<String, Link>? routes, dynamic arguments}) async {
+  Future push(String routeName, {Map<String, Link>? routes, dynamic arguments}) async {
     if (routes != null) {
       Link? link = getRouteFromName(routeName, routes);
 
@@ -38,7 +38,7 @@ class Rodeo {
         : navigatorKey!.currentState?.pushNamed(routeName, arguments: arguments);
   }
 
-  pop({Map<String, Link>? routes}) async {
+  Future pop({Map<String, Link>? routes}) async {
     return context != null
         ? Navigator.of(context!).pop()
         : navigatorKey!.currentState?.pop();
