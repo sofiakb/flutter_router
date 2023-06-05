@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sofiakb_router/tools/utils.dart';
+import '../tools/utils.dart';
 
 import 'link.dart';
 
