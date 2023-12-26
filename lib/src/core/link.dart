@@ -14,6 +14,8 @@ class Link {
   bool bottomNavigation;
   RouteGuard? guard;
 
+  void Function(BuildContext context, String path)? onNavigate;
+
   Link({
     this.icon,
     this.activeIcon,
@@ -24,8 +26,9 @@ class Link {
     this.initial = false,
     this.desktopOnly = false,
     this.bottomNavigation = false,
-    this.guard
+    this.guard,
+    this.onNavigate
   });
 
-  void to(BuildContext context) => Navigator.pushNamed(context, path);
+  void to(BuildContext context) => onNavigate != null ? onNavigate!(context, path) : Navigator.pushNamed(context, path);
 }
