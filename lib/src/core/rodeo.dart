@@ -1,46 +1,34 @@
-import 'package:flutter/material.dart';
-import '../tools/utils.dart';
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 
+import '../tools/utils.dart';
 import 'link.dart';
 
 class Rodeo {
-  final BuildContext? context;
-  final GlobalKey<NavigatorState>? navigatorKey;
+  final BuildContext context;
+  final GoRouter? router;
 
-  Rodeo({this.context, this.navigatorKey});
+  Rodeo({required this.context, this.router});
 
-  // static final Rodeo _instance = Rodeo._internal();
-  //
-  // factory Rodeo() {
-  //   return _instance;
-  // }
-  //
-  // Rodeo._internal({this.context, this.navigatorKey}) {}
+  Future<void> push(String routeName,
+      {Map<String, Link>? routes, Object? extra}) async {
+    final goRouter = router ?? GoRouter.of(context);
 
-  static Rodeo of(BuildContext context) => Rodeo(context: context);
-
-  static Rodeo key(GlobalKey<NavigatorState> navigatorKey) =>
-      Rodeo(navigatorKey: navigatorKey);
-
-  Future push(String routeName, {Map<String, Link>? routes, dynamic arguments}) async {
+    // Check for a route guard
     if (routes != null) {
-      Link? link = getRouteFromName(routeName, routes);
-
+      final Link? link = getRouteFromName(routeName, routes);
       if (link != null &&
           link.guard != null &&
-          await link.guard!.handle(context) == false) {
-        return false;
+          !(await link.guard!.handle(context))) {
+        return; // Guard blocked navigation
       }
     }
 
-    return context != null
-        ? Navigator.of(context!).pushNamed(routeName, arguments: arguments)
-        : navigatorKey!.currentState?.pushNamed(routeName, arguments: arguments);
+    goRouter.go(routeName, extra: extra);
   }
 
-  Future pop({Map<String, Link>? routes}) async {
-    return context != null
-        ? Navigator.of(context!).pop()
-        : navigatorKey!.currentState?.pop();
+  void pop() {
+    final goRouter = router ?? GoRouter.of(context);
+    goRouter.pop();
   }
 }
