@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'route_guard.dart';
 
@@ -27,8 +28,12 @@ class Link {
     this.desktopOnly = false,
     this.bottomNavigation = false,
     this.guard,
-    this.onNavigate
+    this.onNavigate,
   });
 
-  void to(BuildContext context) => onNavigate != null ? onNavigate!(context, path) : Navigator.pushNamed(context, path);
+  void to(BuildContext context) {
+    onNavigate != null
+        ? onNavigate!(context, path)
+        : context.go(path);
+  }
 }
