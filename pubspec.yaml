@@ -1,7 +1,7 @@
 name: sofiakb_router
 description: The packages allows to manage routes.
 maintainer: Sofiane Akbly
-version: 2.0.0-dev.3
+version: 2.0.0-dev.4
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -9,6 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  go_router: ^14.2.3
 
 scripts:
   release: ./scripts/release.sh
+dev_dependencies:
+  mockito: ^5.4.4
+  flutter_test:
+    sdk: flutter

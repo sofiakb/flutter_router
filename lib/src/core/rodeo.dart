@@ -1,34 +1,52 @@
-import 'package:flutter/widgets.dart';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sofiakb_router/sofiakb_router.dart';
 
 import '../tools/utils.dart';
-import 'link.dart';
 
 class Rodeo {
-  final BuildContext context;
-  final GoRouter? router;
+  final BuildContext? context;
+  final GlobalKey<NavigatorState>? navigatorKey;
 
-  Rodeo({required this.context, this.router});
+  Rodeo({this.context, this.navigatorKey});
 
-  Future<void> push(String routeName,
-      {Map<String, Link>? routes, Object? extra}) async {
-    final goRouter = router ?? GoRouter.of(context);
+  static Rodeo of(BuildContext context) => Rodeo(context: context);
 
-    // Check for a route guard
+  static Rodeo key(GlobalKey<NavigatorState> navigatorKey) =>
+      Rodeo(navigatorKey: navigatorKey);
+
+  Future push(String routeName,
+      {Map<String, Link>? routes, dynamic arguments}) async {
     if (routes != null) {
-      final Link? link = getRouteFromName(routeName, routes);
+      Link? link = getRouteFromName(routeName, routes);
+      log("helloooo");
+
       if (link != null &&
           link.guard != null &&
-          !(await link.guard!.handle(context))) {
-        return; // Guard blocked navigation
+          await link.guard!.handle(context) == false) {
+        return false;
       }
     }
 
-    goRouter.go(routeName, extra: extra);
+    return context != null
+        ? context!.go(routeName, extra: {'arguments': arguments})
+        : routes != null
+            ? await GoRouter(routes: toRouterRoutes(routes.values.toList()))
+                .push(routeName, extra: {'arguments': arguments})
+            : null;
   }
 
-  void pop() {
-    final goRouter = router ?? GoRouter.of(context);
-    goRouter.pop();
+  Future pop({Map<String, Link>? routes}) async {
+    if (context != null) {
+      // Vérifie si le widget est encore dans l'arbre de widgets
+      if (GoRouter.maybeOf(context!) != null) {
+        return GoRouter.of(context!).pop();
+      }
+      throw FlutterError('Le contexte n’est plus valide pour appeler pop.');
+    } else {
+      return navigatorKey?.currentState?.pop();
+    }
   }
 }
