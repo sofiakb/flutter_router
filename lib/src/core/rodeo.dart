@@ -36,9 +36,8 @@ class Rodeo {
             queryParameters: queryParameters,
             extra: {'arguments': arguments})
         : routes != null
-            ? await GoRouter(
-                    routes: toRouterRoutes(routes.values.toList(),
-                        navigatorKey: navigatorKey))
+            ? await createRouter(routes.values.toList(),
+                    navigatorKey: navigatorKey)
                 .pushNamed(routeName,
                     pathParameters: pathParameters,
                     queryParameters: queryParameters,
