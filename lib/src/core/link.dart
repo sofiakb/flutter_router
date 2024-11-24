@@ -8,6 +8,7 @@ class Link {
   late IconData? activeIcon;
   late String title;
   late String path;
+  late String name;
   late Widget widget;
   late Widget? view;
   bool initial;
@@ -22,6 +23,7 @@ class Link {
     this.activeIcon,
     required this.title,
     required this.path,
+    required this.name,
     required this.widget,
     this.view,
     this.initial = false,

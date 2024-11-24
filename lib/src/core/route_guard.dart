@@ -1,31 +1,29 @@
-import 'dart:developer';
-
 class RouteGuard {
-  String from;
-  String to;
-  String Function()? onSuccess;
-  String Function()? onError;
+  void Function()? onSuccess;
+  void Function()? onError;
+  String redirectTo;
 
   RouteGuard({
-    required this.from,
-    required this.to,
     required this.onSuccess,
     required this.onError,
+    this.redirectTo = '/',
   });
 
   Future<bool> handle(context) async {
+    const isAllowed = true;
+    if (!isAllowed) {
+      this.handleError();
+      return false;
+    }
+    this.handleSuccess();
     return true;
   }
 
-  String handleSuccess() {
-    log('success');
-    log(to);
-    return onSuccess == null ? to : onSuccess!();
+  void handleSuccess() {
+    return onSuccess == null ? null : onSuccess!();
   }
 
-  String handleError() {
-    log('error');
-    log(from);
-    return onError == null ? from : onError!();
+  void handleError() {
+    return onError == null ? null : onError!();
   }
 }
