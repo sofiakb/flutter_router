@@ -53,7 +53,7 @@ class Rodeo {
       }
     }
     return routes != null
-        ? createRouter(routes.values.toList()).pop()
+        ? createRouter(routes.values.toList(), navigatorKey: navigatorKey).pop()
         : navigatorKey?.currentState?.pop();
   }
 }
