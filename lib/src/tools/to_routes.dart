@@ -28,6 +28,9 @@ List<GoRoute> toRouterRoutes(List<Link> routes,
             ))
         .toList();
 
-GoRouter createRouter(List<Link> routes, {GlobalKey<NavigatorState>? navigatorKey}) => GoRouter(
+GoRouter createRouter(List<Link> routes,
+        {GlobalKey<NavigatorState>? navigatorKey}) =>
+    GoRouter(
+      navigatorKey: navigatorKey,
       routes: toRouterRoutes(routes, navigatorKey: navigatorKey),
     );
