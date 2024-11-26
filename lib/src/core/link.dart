@@ -8,7 +8,7 @@ class Link {
   late String title;
   late String path;
   late Widget Function(BuildContext) widget;
-  late Widget Function()? view;
+  late Widget? Function()? view;
   bool initial;
   bool desktopOnly;
   bool bottomNavigation;
