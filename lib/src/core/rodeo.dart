@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sofiakb_router/sofiakb_router.dart';
-
 import '../tools/utils.dart';
+
+import 'link.dart';
 
 class Rodeo {
   final BuildContext? context;
@@ -10,16 +9,20 @@ class Rodeo {
 
   Rodeo({this.context, this.navigatorKey});
 
+  // static final Rodeo _instance = Rodeo._internal();
+  //
+  // factory Rodeo() {
+  //   return _instance;
+  // }
+  //
+  // Rodeo._internal({this.context, this.navigatorKey}) {}
+
   static Rodeo of(BuildContext context) => Rodeo(context: context);
 
   static Rodeo key(GlobalKey<NavigatorState> navigatorKey) =>
       Rodeo(navigatorKey: navigatorKey);
 
-  Future push(String routeName,
-      {Map<String, Link>? routes,
-      dynamic arguments,
-      Map<String, String> pathParameters = const <String, String>{},
-      Map<String, dynamic> queryParameters = const <String, dynamic>{}}) async {
+  Future push(String routeName, {Map<String, Link>? routes, dynamic arguments}) async {
     if (routes != null) {
       Link? link = getRouteFromName(routeName, routes);
 
@@ -30,29 +33,14 @@ class Rodeo {
       }
     }
 
-    return (context != null
-        ? context!.pushNamed(routeName,
-            pathParameters: pathParameters,
-            queryParameters: queryParameters,
-            extra: {'arguments': arguments})
-        : routes != null
-            ? await createRouter(routes.values.toList(),
-                    navigatorKey: navigatorKey)
-                .pushNamed(routeName,
-                    pathParameters: pathParameters,
-                    queryParameters: queryParameters,
-                    extra: {'arguments': arguments})
-            : null);
+    return context != null
+        ? Navigator.of(context!).pushNamed(routeName, arguments: arguments)
+        : navigatorKey!.currentState?.pushNamed(routeName, arguments: arguments);
   }
 
   Future pop({Map<String, Link>? routes}) async {
-    if (context != null) {
-      if (GoRouter.maybeOf(context!) != null) {
-        return GoRouter.of(context!).pop();
-      }
-    }
-    return routes != null
-        ? createRouter(routes.values.toList(), navigatorKey: navigatorKey).pop()
-        : navigatorKey?.currentState?.pop();
+    return context != null
+        ? Navigator.of(context!).pop()
+        : navigatorKey!.currentState?.pop();
   }
 }

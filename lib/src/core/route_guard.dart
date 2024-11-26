@@ -1,29 +1,17 @@
 class RouteGuard {
+  String? from;
+  String? to;
   void Function()? onSuccess;
   void Function()? onError;
-  String redirectTo;
 
   RouteGuard({
-    required this.onSuccess,
-    required this.onError,
-    this.redirectTo = '/',
+    this.from,
+    this.to,
+    this.onSuccess,
+    this.onError,
   });
 
   Future<bool> handle(context) async {
-    const isAllowed = true;
-    if (!isAllowed) {
-      this.handleError();
-      return false;
-    }
-    this.handleSuccess();
     return true;
-  }
-
-  void handleSuccess() {
-    return onSuccess == null ? null : onSuccess!();
-  }
-
-  void handleError() {
-    return onError == null ? null : onError!();
   }
 }
