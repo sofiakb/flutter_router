@@ -7,8 +7,8 @@ class Link {
   late IconData? activeIcon;
   late String title;
   late String path;
-  late Widget widget;
-  late Widget? view;
+  late Widget Function(BuildContext) widget;
+  late Widget Function()? view;
   bool initial;
   bool desktopOnly;
   bool bottomNavigation;
@@ -16,19 +16,20 @@ class Link {
 
   void Function(BuildContext context, String path)? onNavigate;
 
-  Link({
-    this.icon,
-    this.activeIcon,
-    required this.title,
-    required this.path,
-    required this.widget,
-    this.view,
-    this.initial = false,
-    this.desktopOnly = false,
-    this.bottomNavigation = false,
-    this.guard,
-    this.onNavigate
-  });
+  Link(
+      {this.icon,
+      this.activeIcon,
+      required this.title,
+      required this.path,
+      required this.widget,
+      this.view,
+      this.initial = false,
+      this.desktopOnly = false,
+      this.bottomNavigation = false,
+      this.guard,
+      this.onNavigate});
 
-  void to(BuildContext context) => onNavigate != null ? onNavigate!(context, path) : Navigator.pushNamed(context, path);
+  void to(BuildContext context) => onNavigate != null
+      ? onNavigate!(context, path)
+      : Navigator.pushNamed(context, path);
 }
