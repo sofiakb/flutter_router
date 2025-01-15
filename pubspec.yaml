@@ -9,11 +9,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  go_router: ^14.2.3
+  go_router: ^14.6.3
 
-scripts:
-  release: ./scripts/release.sh
 dev_dependencies:
   mockito: ^5.4.4
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+scripts:
+  release: ./scripts/release.sh
+
