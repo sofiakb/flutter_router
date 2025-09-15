@@ -1,73 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 class Rodeo {
-  BuildContext? context;
-  GlobalKey<NavigatorState>? navigatorKey;
-  GoRouter? router;
+  Rodeo._internal();
 
   static final Rodeo instance = Rodeo._internal();
 
-  factory Rodeo(GoRouter router, BuildContext context,
-      GlobalKey<NavigatorState>? navigatorKey) {
-    instance.router = router;
+  BuildContext? context;
+  GlobalKey<NavigatorState>? navigatorKey;
+  late GoRouter router;
+
+  static void initialize({
+    required BuildContext context,
+    required GoRouter router,
+    required GlobalKey<NavigatorState>? navigatorKey,
+  }) {
     instance.context = context;
+    instance.router = router;
     instance.navigatorKey = navigatorKey;
-    return instance;
   }
 
-  Rodeo._internal();
+  GoRouter _r() => router;
 
-  static initialize(
-          {required BuildContext context,
-          required GoRouter router,
-          required GlobalKey<NavigatorState>? navigatorKey}) =>
-      Rodeo(router, context, navigatorKey);
+  BuildContext _ctx() =>
+      context ?? _r().routerDelegate.navigatorKey.currentContext!;
 
   Future push(
     String routeName, {
-    Map<String, String> pathParameters = const <String, String>{},
-    Map<String, dynamic> queryParameters = const <String, dynamic>{},
+    Map<String, String> pathParameters = const {},
+    Map<String, dynamic> queryParameters = const {},
     Object? extra,
-  }) async {
-    return context != null
-        ? context!.pushNamed(
-            routeName,
-            pathParameters: pathParameters,
-            queryParameters: pathParameters,
-            extra: extra,
-          )
-        : router!.pushNamed(
-            routeName,
-            pathParameters: pathParameters,
-            queryParameters: pathParameters,
-            extra: extra,
-          );
+  }) {
+    final qp = queryParameters.map((k, v) => MapEntry(k, v?.toString()));
+    final ctx = context;
+    return ctx != null
+        ? ctx.pushNamed(routeName,
+            pathParameters: pathParameters, queryParameters: qp, extra: extra)
+        : _r().pushNamed(routeName,
+            pathParameters: pathParameters, queryParameters: qp, extra: extra);
   }
 
   Future go(
     String routeName, {
-    Map<String, String> pathParameters = const <String, String>{},
-    Map<String, dynamic> queryParameters = const <String, dynamic>{},
+    Map<String, String> pathParameters = const {},
+    Map<String, dynamic> queryParameters = const {},
     Object? extra,
-  }) async {
-    return context != null
-        ? context!.goNamed(
-            routeName,
-            pathParameters: pathParameters,
-            queryParameters: pathParameters,
-            extra: extra,
-          )
-        : router!.goNamed(
-            routeName,
-            pathParameters: pathParameters,
-            queryParameters: pathParameters,
-            extra: extra,
-          );
+  }) {
+    final qp = queryParameters.map((k, v) => MapEntry(k, v?.toString()));
+    final ctx = context;
+    if (ctx != null) {
+      ctx.goNamed(routeName,
+          pathParameters: pathParameters, queryParameters: qp, extra: extra);
+    } else {
+      router!.goNamed(routeName,
+          pathParameters: pathParameters, queryParameters: qp, extra: extra);
+    }
+    return Future.value();
   }
 
-  Future pop() async {
-    return context != null ? context!.pop() : router!.pop();
+  void pop() {
+    final ctx = context;
+    if (ctx != null) {
+      if (Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
+      return;
+    }
+    _r().pop();
   }
 }
