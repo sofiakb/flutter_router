@@ -24,10 +24,11 @@ class Link {
   final IconData? icon;
   final IconData? activeIcon;
 
-  //late Widget Function(BuildContext) widget;
-  //late Widget? Function()? view;
-
-  final void Function(BuildContext context, String path)? onNavigate;
+  final void Function(BuildContext context, String name, {
+  Map<String, String> pathParameters,
+  Map<String, String> queryParameters,
+  Object? extra,
+  })? onNavigate;
 
   const Link({
     required this.goRoute,
@@ -36,10 +37,6 @@ class Link {
     this.links = const [],
     this.icon,
     this.activeIcon,
-
-    // required this.widget,
-    // this.view,
-
     this.initial = false,
     this.desktopOnly = false,
     this.bottomNavigation = false,
@@ -47,76 +44,67 @@ class Link {
     this.onNavigate,
   });
 
-  void to(BuildContext context) => onNavigate != null
-      ? onNavigate!(context, goRoute.path)
-      : context.pushNamed(goRoute.path);
+  void toGo(BuildContext context, {
+    Map<String, String> pathParameters = const {},
+    Map<String, String> queryParameters = const {},
+    Object? extra,
+  }) {
+    final name = goRoute.name ?? pathToName(goRoute.path);
+    if (onNavigate != null) {
+      onNavigate!(context, name, pathParameters: pathParameters, queryParameters: queryParameters, extra: extra);
+      return;
+    }
+    context.goNamed(name, pathParameters: pathParameters, queryParameters: queryParameters, extra: extra);
+  }
 
-  static GoRouterWidgetBuilder get defaultGoRouteBuilder =>
-      _defaultGoRouteBuilder;
-
-  static GoRouterPageBuilder get defaultGoRoutePageBuilder =>
-      _defaultGoRoutePageBuilder;
-
-  static GoRoute goRouteGenerator({
-    required String path,
-    required String name,
-    GoRouterWidgetBuilder? builder,
-    GoRouterPageBuilder? pageBuilder,
-    GlobalKey<NavigatorState>? parentNavigatorKey,
-    GoRouterRedirect? redirect,
-    ExitCallback? onExit,
-    List<GoRoute> routes = const [],
-  }) =>
-      GoRoute(
-          name: name,
-          path: path,
-          builder: builder,
-          pageBuilder: builder == null && pageBuilder == null
-              ? defaultGoRoutePageBuilder
-              : pageBuilder,
-          // builder: builder == null && pageBuilder == null
-          //     ? defaultGoRouteBuilder
-          //     : builder,
-          // pageBuilder: pageBuilder,
-          parentNavigatorKey: parentNavigatorKey,
-          redirect: redirect,
-          onExit: onExit,
-          routes: routes);
+  void toPush(BuildContext context, {
+    Map<String, String> pathParameters = const {},
+    Map<String, String> queryParameters = const {},
+    Object? extra,
+  }) {
+    final name = goRoute.name ?? pathToName(goRoute.path);
+    if (onNavigate != null) {
+      onNavigate!(context, name, pathParameters: pathParameters, queryParameters: queryParameters, extra: extra);
+      return;
+    }
+    context.pushNamed(name, pathParameters: pathParameters, queryParameters: queryParameters, extra: extra);
+  }
 
   GoRoute toGoRoute() => GoRoute(
-        path: goRoute.path,
-        name: goRoute.name ?? pathToName(goRoute.path),
-        builder: goRoute.builder ??
-            (context, state) {
-              if (guard != null) {
-                return FutureBuilder(
-                    future: guard!.handle(context),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+    path: goRoute.path,
+    name: goRoute.name ?? pathToName(goRoute.path),
+    builder: goRoute.pageBuilder == null && goRoute.builder == null
+        ? (context, state) => _guardedScreen(context)
+        : goRoute.builder,
+    pageBuilder: goRoute.pageBuilder,
+    parentNavigatorKey: goRoute.parentNavigatorKey,
+    redirect: goRoute.redirect,
+    onExit: goRoute.onExit,
+    routes: links.map((l) => l.toGoRoute()).toList(),
+  );
 
-                      if (snapshot.hasError) {
-                        return Text(snapshot.error.toString());
-                      }
+  Widget _guardedScreen(BuildContext context) {
+    if (guard == null) return screen();
 
-                      return snapshot.data == true
-                          ? screen()
-                          : const Placeholder();
-                    });
-              }
-              return screen();
-            },
-        pageBuilder: goRoute.pageBuilder != defaultGoRoutePageBuilder
-            ? goRoute.pageBuilder
-            : null,
-        // builder:
-        //     goRoute.builder != defaultGoRouteBuilder ? goRoute.builder : null,
-        // pageBuilder: goRoute.pageBuilder ??
-        //     (context, state) => NoTransitionPage(child: screen()),
-        parentNavigatorKey: goRoute.parentNavigatorKey,
-        redirect: goRoute.redirect,
-        onExit: goRoute.onExit,
-        routes: links.map((link) => link.toGoRoute()).toList(),
-      );
+    final future = guard!.handle(context);
+    return FutureBuilder<bool>(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Text(snapshot.error.toString());
+        }
+        final allowed = snapshot.data == true;
+        if (allowed) return screen();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // utiliser une route nommée stable
+          context.goNamed('login'); // ou une constante partagée
+        });
+        return const SizedBox.shrink();
+      },
+    );
+  }
 }
+
