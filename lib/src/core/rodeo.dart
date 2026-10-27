@@ -22,6 +22,7 @@ class Rodeo {
 
   GoRouter _r() => router;
 
+  // ignore: unused_element
   BuildContext _ctx() =>
       context ?? _r().routerDelegate.navigatorKey.currentContext!;
 
@@ -52,7 +53,7 @@ class Rodeo {
       ctx.goNamed(routeName,
           pathParameters: pathParameters, queryParameters: qp, extra: extra);
     } else {
-      router!.goNamed(routeName,
+      router.goNamed(routeName,
           pathParameters: pathParameters, queryParameters: qp, extra: extra);
     }
     return Future.value();

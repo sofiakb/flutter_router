@@ -132,6 +132,8 @@ class Link {
           onExit: onExit,
           routes: routes);
 
+  // Not wired yet: kept for the upcoming route guard support.
+  // ignore: unused_element
   Widget _guardedScreen(BuildContext context) {
     if (guard == null) return screen();
 
